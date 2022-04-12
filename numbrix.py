@@ -26,32 +26,71 @@ class NumbrixState:
 
 class Board:
     """ Representação interna de um tabuleiro de Numbrix. """
+
+    def __init__(self):
+        self.boardSize = 0
+
+        # Board will be represeented as a list of lists
+        self.board = []
+
     
     def get_number(self, row: int, col: int) -> int:
         """ Devolve o valor na respetiva posição do tabuleiro. """
-        # TODO
-        pass
+        return self.board[row][col]
     
     def adjacent_vertical_numbers(self, row: int, col: int) -> (int, int):
         """ Devolve os valores imediatamente abaixo e acima, 
         respectivamente. """
-        # TODO
-        pass
+
+        if row == 0:
+            return (-1,self.board[row][col+1])
+        if row == self.boardSize-1:
+            return (self.board[row][col-1],-1)
+        return (self.board[row][col-1], self.board[row][col+1])
     
     def adjacent_horizontal_numbers(self, row: int, col: int) -> (int, int):
         """ Devolve os valores imediatamente à esquerda e à direita, 
         respectivamente. """
-        # TODO
-        pass
+        
+        if col == 0:
+            return (-1,self.board[row+1][col])
+        if col == self.boardSize-1:
+            return (self.board[row-1][col],-1)
+        return (self.board[row-1][col], self.board[row+1][col])
     
     @staticmethod    
     def parse_instance(filename: str):
         """ Lê o ficheiro cujo caminho é passado como argumento e retorna
         uma instância da classe Board. """
-        # TODO
-        pass
+    
+        # Create the board object
+        myBoard = Board()
+        with open(filename,"r") as f:
+
+            # Read the size of the board
+            myBoard.boardSize = int(f.readline())
+
+            # Read the whole board
+            lines = f.readlines()
+
+            for line in lines:
+                myBoard.board.append([int(x) for x in line.split("\t")])
+
+        return myBoard
+
+    def __repr__(self):
+        myString = ""
+
+        for line in self.board:
+            for number in line:
+                myString = myString +  f" {number}"
+            myString += "\n"
+        
+        return myString[:-1]
 
     # TODO: outros metodos da classe
+
+    
 
 
 class Numbrix(Problem):
@@ -90,9 +129,15 @@ class Numbrix(Problem):
 
 
 if __name__ == "__main__":
-    # TODO:
+
+
     # Ler o ficheiro de input de sys.argv[1],
+    myBoard = Board.parse_instance(sys.argv[1])
+    
     # Usar uma técnica de procura para resolver a instância,
+
     # Retirar a solução a partir do nó resultante,
+    
     # Imprimir para o standard output no formato indicado.
-    pass
+    
+    
