@@ -1,0 +1,7 @@
+this is the first implementation
+it generates a maximum of 8 actions per iteration
+not optimized, bad complexity
+
+does the first test but does not do any of the other tests in a reseanable time
+
+check the complexity in excel
