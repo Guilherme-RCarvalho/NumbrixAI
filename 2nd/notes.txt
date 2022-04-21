@@ -1,0 +1,20 @@
+this is the second version
+it is using a list and dict
+
+it would be best to have only dict, but not very practical
+this way is a good compromise between list and dictionary
+
+it is doins de second test with 15 secs with test 2
+
+but for some reason it is not working with test4
+
+preencher como cobra, comecando do mais alto, indo para cima, depois voltar para o mais alto original e ir para baixo
+next vou tentar fazer mesmo como a marta faz
+depois disso vou olhar para a roseta
+
+mas antes disso tenho de perceber qual e o problema com o 4
+parece ter um problema com o 6 tambem
+
+JA FICOU CORRIGIDO A CENA DO 4, TINHA HAVER COM COMECAR COM O MAX SENDO 36
+
+python -m cProfile -s calls numbrix1.py tests_final_public/input2.txt

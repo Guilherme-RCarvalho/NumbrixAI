@@ -11,6 +11,10 @@ import copy
 from search import Problem, Node, astar_search, breadth_first_tree_search, depth_first_tree_search, greedy_search, recursive_best_first_search
 import time
 
+
+actionsCounter = 0 # represents how many actions were generated
+timeList = []
+
 class NumbrixState:
     state_id = 0
 
@@ -48,11 +52,15 @@ class Board:
         
     def getRawBoard(self):
         """" Devolve o estado em que a Board esta, sendo este a lista de listas representado o board e o numero de posicoes preenchidas """
-        return self.board.copy(), self.filledSquares
+        return self.board, self.filledSquares
     
         
     def makeAction(self, action: (int, int, int)): #  row: int, col: int, value: int):
         """ Recebe um tuplo com: uma linha, uma coluna e um valor, e mete esse valor na posicao dada  """      
+        
+        if action == (6,3,2):
+            print("here")
+            exit()
         self.board[action[0]][action[1]] = action[2]
         return
 
@@ -63,11 +71,22 @@ class Board:
     def adjacent_vertical_numbers(self, row: int, col: int) -> (int, int):
         """ Devolve os valores imediatamente acima e abaixo, 
         respectivamente. """
+        global timeList
+
+        start = time.time()
+
         if row == 0:
             return (-1,self.board[row+1][col])
         if row == self.boardSize-1:
             return (self.board[row-1][col],-1)
         
+        end = time.time()
+        # print(f"adj took {(end-start)*1000} ms")
+        timeList.append((end-start)*1000)
+        if len(timeList) > 30_000:
+            print(f"this is the avg {sum(timeList)/len(timeList)}")
+            timeList = []
+            
         return (self.board[row-1][col], self.board[row+1][col])
     
     def adjacent_horizontal_numbers(self, row: int, col: int) -> (int, int):
@@ -132,15 +151,19 @@ class Numbrix(Problem):
         super().__init__(self.currentState)
 
         self.possibleStates = [] # To be filled with all the states that can be reach from the current state
-        
+
+    
     def actions(self, state: NumbrixState):
         """ Retorna uma lista de ações que podem ser executadas a
         partir do estado passado como argumento. """
-        
+
+        global actionsCounter
+
         # vamos primeiro a cada numero colocado, ver os vizinhos e criar estados em que os vizinhos sao todos os os numeros adjacentes
         # para isto se calhar vou querer ter um dicionario de numeros ja colocados e as posicoes deles mas por enquanto nao vou fazer isso
         
         # get the dict of placed numbers THIS CAN BE OPTIMIZED (prob create a list)
+        
         myBoard, _ = state.board.getRawBoard()
         stateList = []
         
@@ -161,6 +184,7 @@ class Numbrix(Problem):
         # vou ter uns problemas com isto depois quando voltar para o min, na verdade eu quero voltar para o max inicial mas depois penso nisto
         isIncreasing = 1
         # print(placedValuesDict)
+
         if max(placedValuesDict.keys()) < state.board.boardSize*state.board.boardSize:
             choosenNumber = max(placedValuesDict.keys())
         else:
@@ -187,36 +211,7 @@ class Numbrix(Problem):
             stateList.append( ( myPos[0], myPos[1], choosenNumber + ( 1*isIncreasing ) ) )
 
 
-
-        # # for each placed value (in incrementing order) 
-        # neighborOrder = [[-1,0], [1, 0], [0, -1], [0, 1]]  # order that  I will be looking at the neighbors up, down, left, right
-        # for value in sorted(placedValuesDict.keys()):
-        #     # pegar os adjacentes para os lados e para cima da posicao do numero colocado
-        #     adjacentPostions = myBoard.adjacent_vertical_numbers(placedValuesDict[value][0], placedValuesDict[value][1]) + myBoard.adjacent_horizontal_numbers(placedValuesDict[value][0], placedValuesDict[value][1])
-
-        #     for x in range(len(neighborOrder)):
-
-        #         if adjacentPostions[x] != 0:
-        #             continue
-            
-        #         # means that I will want to create a new state (possible two) where the possition is neighborOrder[x]
-        #         # check if i need two states or one state (only need one state if the value is 1 or the value is max)
-        #         if value == 1:
-        #             changeNumberList = [1]
-        #         elif value == myBoard.boardSize*myBoard.boardSize:
-        #             changeNumberList = [-1]
-        #         else:
-        #             changeNumberList = [1, -1]
-                
-        #         for incrimentValue in changeNumberList:
-                    
-        #             # i dont want to add a number that is already on the board
-        #             if value + incrimentValue in placedValuesDict.keys():
-        #                 continue
-
-        #             myPos = [element1 + element2 for (element1, element2) in zip(placedValuesDict[value], neighborOrder[x])]
-        #             stateList.append((myPos[0], myPos[1], value + incrimentValue))
-            
+        actionsCounter += len(stateList)
         return stateList
 
 
@@ -231,11 +226,13 @@ class Numbrix(Problem):
         # I will want to create a new state, not edit the old one
 
 
-
+        start = time.time()
 
         # Create the newState
         boardRepresent, filledSquare = state.board.getRawBoard()
         newBoard = Board(copy.deepcopy(boardRepresent), filledSquare)
+
+        # newBoard = Board(copy.deepcopy(boardRepresent), filledSquare)
         newState = NumbrixState(newBoard)
         # Update new state
         newBoard.makeAction(action)
@@ -251,13 +248,15 @@ class Numbrix(Problem):
         # print("updating last placed number to ", action[2])
         newState.lastPlacedNumber = action[2]
 
+
+        end = time.time()
+        # print(f"Result took {(end-start)*1000} ms")
         return newState
 
     def goal_test(self, state: NumbrixState):
         """ Retorna True se e só se o estado passado como argumento é
         um estado objetivo. Deve verificar se todas as posições do tabuleiro 
         estão preenchidas com uma sequência de números adjacentes. """
-
 
         # print("Testing this board")
         # print(state.board)
@@ -326,7 +325,6 @@ class Numbrix(Problem):
 
 if __name__ == "__main__":
 
-
     # Ler o ficheiro de input de sys.argv[1],
     myBoard = Board.parse_instance(sys.argv[1])
 
@@ -342,5 +340,6 @@ if __name__ == "__main__":
     print("The solution is:\n", objective.state.board, sep="")
     end = time.time()
     print("It took: ", end - start)
-
+    
+    print(f"Did this amount of acitons {actionsCounter}")
     
