@@ -25,7 +25,12 @@ class NumbrixState:
         self.board = board
         self.id = NumbrixState.state_id
         NumbrixState.state_id += 1
+
+        self.parentId = 0
+
         self.lastPlacedNumber = -1
+        self.isIncreasing = 1 # used to know if numbers increasing or decreasing. has to be passed from father state to child state
+
 
     def __lt__(self, other):
         return self.id < other.id
@@ -188,8 +193,6 @@ class Numbrix(Problem):
         self.currentState = NumbrixState(board)
         self.originalState = self.currentState
         super().__init__(self.currentState)
-
-        self.isIncreasing = 1 # use to know if I should increment or decrement the placed number
         
 
     def actions(self, state: NumbrixState):
@@ -218,8 +221,8 @@ class Numbrix(Problem):
         
         
         
-        print("This is the board")
-        print(state.board)
+        # print("This is the board")
+        # print(state.board)
 
         if state.lastPlacedNumber == -1:
             # quer dizer que e a minha primeira iteracao e quero escolher o valor minimo
@@ -230,14 +233,16 @@ class Numbrix(Problem):
             # mas se o lastPlacedNumber + 1 for o maximo, entao eu vou querer escolher o min e comecar a diminuir
             choosenNumber = state.lastPlacedNumber
 
-            if(state.lastPlacedNumber == myBoard.boardSize*myBoard.boardSize):
+
+            while(choosenNumber + state.isIncreasing in state.board.boardDict.keys()):
+                choosenNumber = choosenNumber + state.isIncreasing
+
+            if(choosenNumber == myBoard.boardSize*myBoard.boardSize):
                 # isto quer dizer que ja coloquei o ultimo numero para cima, entao vamos voltar ao min e comecar a colocar para baixo
-                self.isIncreasing = -1
-                print("I have reached the maximum!")
+                # print("I have reached the max")
+                state.isIncreasing = -1
                 choosenNumber = min(myBoard.boardDict.keys())
 
-            while(choosenNumber + self.isIncreasing in state.board.boardDict.keys()):
-                choosenNumber = choosenNumber + self.isIncreasing
          
         adjacentPostions = myBoard.adjacent_vertical_numbers(myBoard.boardDict[choosenNumber][0], myBoard.boardDict[choosenNumber][1]) + myBoard.adjacent_horizontal_numbers(myBoard.boardDict[choosenNumber][0], myBoard.boardDict[choosenNumber][1])
         neighborOrder = [[-1,0], [1, 0], [0, -1], [0, 1]]  # order that  I will be looking at the neighbors up, down, left, right
@@ -250,17 +255,16 @@ class Numbrix(Problem):
         
             # vou querer meter o choosenNumber + 1 para os vizgit add .inhos
             myPos = [element1 + element2 for (element1, element2) in zip(myBoard.boardDict[choosenNumber], neighborOrder[x])]
-            stateList.append( ( myPos[0], myPos[1], choosenNumber + self.isIncreasing ) )
+            stateList.append( ( myPos[0], myPos[1], choosenNumber + state.isIncreasing ) )
 
             
 
         actionsCounter += len(stateList)
-        if choosenNumber == -2:
-            print("There has been a mistake")
-            exit()
-        print(f"Choosen number {choosenNumber} and this is the placed number {choosenNumber+self.isIncreasing}")
-        print("This is the aciton list  ", stateList)
-        print( )
+
+        # print(f"THis is the parent ID {state.parentId} and this is my id {state.id}")
+        # print(f"Choosen number {choosenNumber} placed number {choosenNumber+state.isIncreasing} isIncreasing {state.isIncreasing}")
+        # print("This is the aciton list  ", stateList)
+        # print( )
         return stateList
 
 
@@ -293,6 +297,8 @@ class Numbrix(Problem):
 
         # print("updating last placed number to ", action[2])
         newState.lastPlacedNumber = action[2]
+        newState.isIncreasing = state.isIncreasing
+        newState.parentId = state.id
 
         return newState
 
