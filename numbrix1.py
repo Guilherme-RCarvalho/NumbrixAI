@@ -248,15 +248,17 @@ class Numbrix(Problem):
                 # in that case I do not want to fill it
                 continue
         
-            # vou querer meter o choosenNumber + 1 para os vizinhos
+            # vou querer meter o choosenNumber + 1 para os vizgit add .inhos
             myPos = [element1 + element2 for (element1, element2) in zip(myBoard.boardDict[choosenNumber], neighborOrder[x])]
             stateList.append( ( myPos[0], myPos[1], choosenNumber + self.isIncreasing ) )
 
             
 
         actionsCounter += len(stateList)
-        
-        print(f"Choosen number {choosenNumber} and this is the placed number {choosenNumber+}")
+        if choosenNumber == -2:
+            print("There has been a mistake")
+            exit()
+        print(f"Choosen number {choosenNumber} and this is the placed number {choosenNumber+self.isIncreasing}")
         print("This is the aciton list  ", stateList)
         print( )
         return stateList
