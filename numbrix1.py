@@ -221,8 +221,8 @@ class Numbrix(Problem):
         
         
         
-        # print("This is the board")
-        # print(state.board)
+        print("This is the board")
+        print(state.board)
 
         if state.lastPlacedNumber == -1:
             # quer dizer que e a minha primeira iteracao e quero escolher o valor minimo
@@ -234,14 +234,14 @@ class Numbrix(Problem):
             choosenNumber = state.lastPlacedNumber
 
 
-            while(choosenNumber + state.isIncreasing in state.board.boardDict.keys()):
-                choosenNumber = choosenNumber + state.isIncreasing
+        while(choosenNumber + state.isIncreasing in state.board.boardDict.keys()):
+            choosenNumber = choosenNumber + state.isIncreasing
 
-            if(choosenNumber == myBoard.boardSize*myBoard.boardSize):
-                # isto quer dizer que ja coloquei o ultimo numero para cima, entao vamos voltar ao min e comecar a colocar para baixo
-                # print("I have reached the max")
-                state.isIncreasing = -1
-                choosenNumber = min(myBoard.boardDict.keys())
+        if(choosenNumber == myBoard.boardSize*myBoard.boardSize):
+            # isto quer dizer que ja coloquei o ultimo numero para cima, entao vamos voltar ao min e comecar a colocar para baixo
+            # print("I have reached the max")
+            state.isIncreasing = -1
+            choosenNumber = min(myBoard.boardDict.keys())
 
          
         adjacentPostions = myBoard.adjacent_vertical_numbers(myBoard.boardDict[choosenNumber][0], myBoard.boardDict[choosenNumber][1]) + myBoard.adjacent_horizontal_numbers(myBoard.boardDict[choosenNumber][0], myBoard.boardDict[choosenNumber][1])
@@ -261,10 +261,10 @@ class Numbrix(Problem):
 
         actionsCounter += len(stateList)
 
-        # print(f"THis is the parent ID {state.parentId} and this is my id {state.id}")
-        # print(f"Choosen number {choosenNumber} placed number {choosenNumber+state.isIncreasing} isIncreasing {state.isIncreasing}")
-        # print("This is the aciton list  ", stateList)
-        # print( )
+        print(f"THis is the parent ID {state.parentId} and this is my id {state.id}")
+        print(f"Choosen number {choosenNumber} placed number {choosenNumber+state.isIncreasing} isIncreasing {state.isIncreasing}")
+        print("This is the aciton list  ", stateList)
+        print( )
         return stateList
 
 
