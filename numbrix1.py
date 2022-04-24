@@ -15,6 +15,7 @@ import debugpy
 
 
 actionsCounter = 0 # represents how many actions were generated
+stateSeen = 0
 timeListVer = []
 timeListHor = []
 
@@ -234,7 +235,7 @@ class Numbrix(Problem):
             choosenNumber = state.lastPlacedNumber
 
 
-        while(choosenNumber + state.isIncreasing in state.board.boardDict.keys()):
+        while(choosenNumber + state.isIncreasing in state.board.boardDict):
             choosenNumber = choosenNumber + state.isIncreasing
 
         if(choosenNumber == myBoard.boardSize*myBoard.boardSize):
@@ -244,44 +245,132 @@ class Numbrix(Problem):
             choosenNumber = min(myBoard.boardDict.keys())
 
          
+        # vert = myBoard.adjacent_vertical_numbers(myBoard.boardDict[choosenNumber][0], myBoard.boardDict[choosenNumber][1])
+        # hor = myBoard.adjacent_horizontal_numbers(myBoard.boardDict[choosenNumber][0], myBoard.boardDict[choosenNumber][1])
+        # adjacentPostions = [hor[0], vert[0], hor[1], vert[1]]
+        # neighborOrder = [[0, -1], [-1,0], [0, 1], [1, 0]]  # order that  I will be looking at the neighbors up, down, left, right
+
+
         adjacentPostions = myBoard.adjacent_vertical_numbers(myBoard.boardDict[choosenNumber][0], myBoard.boardDict[choosenNumber][1]) + myBoard.adjacent_horizontal_numbers(myBoard.boardDict[choosenNumber][0], myBoard.boardDict[choosenNumber][1])
         neighborOrder = [[-1,0], [1, 0], [0, -1], [0, 1]]  # order that  I will be looking at the neighbors up, down, left, right
-        
+
+
+        possibleSet = set()
         for x in range(len(neighborOrder)):
             if adjacentPostions[x] != 0:
                 # means that there is either a wall or a number in that position
                 # in that case I do not want to fill it
                 continue
-        
             # vou querer meter o choosenNumber + 1 para os vizgit add .inhos
-            myPos = [element1 + element2 for (element1, element2) in zip(myBoard.boardDict[choosenNumber], neighborOrder[x])]
-            stateList.append( ( myPos[0], myPos[1], choosenNumber + state.isIncreasing ) )
 
-            
+
+            myPos = [element1 + element2 for (element1, element2) in zip(myBoard.boardDict[choosenNumber], neighborOrder[x])]
+            possibleSet.add((myPos[0], myPos[1]))
+
+            # stateList.append( ( myPos[0], myPos[1], choosenNumber + state.isIncreasing ) )
+        
+        futureSet = self.getn1(choosenNumber + state.isIncreasing*2, state)
+        
+        print("Future set ", futureSet)
+        print("Possible set ", possibleSet)
+
+        if len(futureSet) > 0:
+            possibleSet = possibleSet.intersection(futureSet)
+
+        stateList = [(myPos[0], myPos[1], choosenNumber+state.isIncreasing) for myPos in possibleSet]
 
         actionsCounter += len(stateList)
+
 
         print(f"THis is the parent ID {state.parentId} and this is my id {state.id}")
         print(f"Choosen number {choosenNumber} placed number {choosenNumber+state.isIncreasing} isIncreasing {state.isIncreasing}")
         print("This is the aciton list  ", stateList)
         print( )
+
         return stateList
 
+    def getn1(self, number, state, initial=-10):
+        """"
+        Receives a state and a number and will return a set with all the positions where that number could be
+        number represents n+1
+        return set will be a set of lists
+            containing all the possible positions for number
+            maybe will be all possible pos for n (which will be n + state.isIncreasing)
+        initial is used for recursion to keep track of when to stop
+            initial will be the number that I am placing
+            will be set on the first recursion call
 
+
+        asking the future where the number that I am placing can be put in the future
+        """
+        print(f"Doing get {number}, {initial}, breaking in {initial + (2 * state.isIncreasing)}")
+        if number == initial + (state.isIncreasing):
+            # limit my recursion
+            print("     here should be the limit")
+            if number in state.board.boardDict:
+                mySet = set()
+                mySet.add(tuple(state.board.boardDict[number]))
+                print("         but found it dict")
+                return self.getNeighbour(mySet, state)
+            else:
+                print("         but is not in dict")
+
+                return set()
+
+        if number in state.board.boardDict:
+            # the end state for my recursion
+            # isto vai ser no maximo n+2 (se choosen for 5 (5 ja vai estar colocado) entao vou meter 6, olhar para 7 e 8)
+            print("     Found one of the numbers in the dict")
+            
+            if number == 15:
+                print("found 15 ")
+
+            mySet = set()
+            mySet.add(tuple(state.board.boardDict[number]))            
+            return self.getNeighbour(mySet, state)
+
+        # but if the number is not here, then I want to call the recursion
+        print("     Got nothing, doing recursion")
+        myRec = self.getn1(number + state.isIncreasing, state, number if initial == -10 else initial)
+        return self.getNeighbour(myRec, state)
+
+        # basicamente se o numero nao estiver la, vou querer chamar recursiva, se o numero estiver vou so devolver a posicao dele num set
+        # se calhar eu devia era ja devolver um set com os sitios onde n poderia estar baseado neste criterio
+        # mas isso vai ser uma mudanca facil
+
+    def getNeighbour(self, posList, state):
+        """
+        receives a set of pos and for each pos will get the neighbors for that pos and return it all in a set
+        only adds available neighbors
+        """
+
+        neighborOrder = [[-1,0], [1, 0], [0, -1], [0, 1]]  # order that  I will be looking at the neighbors up, down, left, right
+        mySet = set()
+        for pos in posList:
+            neighborList = state.board.adjacent_vertical_numbers(pos[0], pos[1]) + state.board.adjacent_horizontal_numbers(pos[0], pos[1])
+
+            for index in range(len(neighborList)):
+                
+                if neighborList[index] != 0:
+                    continue
+            
+                mySet.add((pos[0]+neighborOrder[index][0], pos[1]+neighborOrder[index][1]))
+        return mySet
 
     def result(self, state: NumbrixState, action: (int, int, int)):
         """ Retorna o estado resultante de executar a 'action' sobre
         'state' passado como argumento. A ação a executar deve ser uma
         das presentes na lista obtida pela execução de 
         self.actions(state). """
-        
+        global stateSeen
+
+        stateSeen += 1
         # print("This is result with this action type ", action, " and this is the new board:")
         # I will want to create a new state, not edit the old one
 
 
 
         # Create the newState
-        # boardRepresent, filledSquare = state.board.getRawBoard()
         newBoard = Board(state.board.board, state.board.filledSquares)
         newState = NumbrixState(newBoard)
         # Update new state
@@ -371,4 +460,5 @@ if __name__ == "__main__":
     print("It took: ", end - start)
     
     print(f"Did this amount of acitons {actionsCounter}")
+    print(f"Seen this amount of states {stateSeen}")
 
