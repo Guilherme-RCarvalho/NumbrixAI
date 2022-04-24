@@ -173,7 +173,8 @@ class Board:
 
         for line in self.board:
             for number in line:
-                myString = myString +  f" {number}"
+                myString = myString +  f"{number}\t"
+            
             myString += "\n"
         
         return myString[:-1]
@@ -217,8 +218,8 @@ class Numbrix(Problem):
         
         
         
-        # print("This is the board")
-        # print(state.board)
+        print("This is the board")
+        print(state.board)
 
         if state.lastPlacedNumber == -1:
             # quer dizer que e a minha primeira iteracao e quero escolher o valor minimo
@@ -232,6 +233,7 @@ class Numbrix(Problem):
             if(state.lastPlacedNumber == myBoard.boardSize*myBoard.boardSize):
                 # isto quer dizer que ja coloquei o ultimo numero para cima, entao vamos voltar ao min e comecar a colocar para baixo
                 self.isIncreasing = -1
+                print("I have reached the maximum!")
                 choosenNumber = min(myBoard.boardDict.keys())
 
             while(choosenNumber + self.isIncreasing in state.board.boardDict.keys()):
@@ -253,9 +255,10 @@ class Numbrix(Problem):
             
 
         actionsCounter += len(stateList)
-        # print(f"Choosen number {choosenNumber}")
-        # print("This is the aciton list  ", stateList)
-        # print( )
+        
+        print(f"Choosen number {choosenNumber} and this is the placed number {choosenNumber+}")
+        print("This is the aciton list  ", stateList)
+        print( )
         return stateList
 
 
