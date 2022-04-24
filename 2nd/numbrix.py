@@ -183,11 +183,8 @@ class Board:
 class Numbrix(Problem):
     def __init__(self, board: Board):
         """ O construtor especifica o estado inicial. """
-        self.currentState = NumbrixState(board)
-        self.originalState = self.currentState
-        super().__init__(self.currentState)
+        super().__init__(NumbrixState(board))
 
-        self.possibleStates = [] # To be filled with all the states that can be reach from the current state
         
     def actions(self, state: NumbrixState):
         """ Retorna uma lista de ações que podem ser executadas a

@@ -282,7 +282,7 @@ class Numbrix(Problem):
 
         # vou dict[n] e vejo se a posicao e vizinha do dict[n+1]
         # ver 1 com 2, 2 com 3, 3 com 4
-        for number in range(1, state.board.boardSize*state.board.boardSize-1):
+        for number in range(1, state.board.boardSize*state.board.boardSize):
             if not self.isNeighbour(placedValuesDict[number], placedValuesDict[number+1]):
                 # print("This was false")
                 return False

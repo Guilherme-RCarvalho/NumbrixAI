@@ -114,7 +114,8 @@ class Board:
         Receives a list that represents a board and generates a dictionary with that board
         """
         self.boardDict = {}
-        
+      
+
         for rowIndex in range(len(self.board)):
             col = self.board[rowIndex]
             for colIndex in range(len(col)):
@@ -187,13 +188,18 @@ class Numbrix(Problem):
         self.originalState = self.currentState
         super().__init__(self.currentState)
 
-        self.possibleStates = [] # To be filled with all the states that can be reach from the current state
+        self.isIncreasing = 1 # use to know if I should increment or decrement the placed number
         
+
     def actions(self, state: NumbrixState):
         """ Retorna uma lista de ações que podem ser executadas a
         partir do estado passado como argumento. """
 
         global actionsCounter
+
+        # eu vou querer tentar mais duas coisas
+        # vou querer tentar fazer do max para baixo e depois max para cima
+        # e vou querer tentar fazer do min para cima e depois min para baixo
 
         # vamos primeiro a cada numero colocado, ver os vizinhos e criar estados em que os vizinhos sao todos os os numeros adjacentes
         # para isto se calhar vou querer ter um dicionario de numeros ja colocados e as posicoes deles mas por enquanto nao vou fazer isso
@@ -208,22 +214,30 @@ class Numbrix(Problem):
         # vamos preencher isto tipo uma cobra, vou pegar no maximo preencher os vizinhos e fazer isso ate chegar ao fim
         # depois vou pegar no meu max inicial e vou comecar a preencher para baixo e verificar se os numeros que estou a meter cabem
         # vou ter uns problemas com isto depois quando voltar para o min, na verdade eu quero voltar para o max inicial mas depois penso nisto
-        isIncreasing = 1
-        # print(placedValuesDict)
+        
+        
+        
+        # print("This is the board")
+        # print(state.board)
 
-        if max(state.board.boardDict.keys()) < state.board.boardSize*state.board.boardSize:
-            choosenNumber = max(state.board.boardDict.keys())
+        if state.lastPlacedNumber == -1:
+            # quer dizer que e a minha primeira iteracao e quero escolher o valor minimo
+            choosenNumber = min(myBoard.boardDict.keys())
         else:
-            # reverting the algo
-            isIncreasing = -1
-            if state.lastPlacedNumber == -1:
-                choosenNumber = max(state.board.boardDict.keys())
-            else:
-                choosenNumber = state.lastPlacedNumber
-            while choosenNumber-1 in state.board.boardDict.keys():
-                choosenNumber -= 1
-            
-        adjacentPostions = myBoard.adjacent_vertical_numbers(state.board.boardDict[choosenNumber][0], state.board.boardDict[choosenNumber][1]) + myBoard.adjacent_horizontal_numbers(state.board.boardDict[choosenNumber][0], state.board.boardDict[choosenNumber][1])
+            # ja nao estou na minha primeira itereacao
+            # entao eu vou querer escolher o lastPlacedNumber + 1
+            # mas se o lastPlacedNumber + 1 for o maximo, entao eu vou querer escolher o min e comecar a diminuir
+            choosenNumber = state.lastPlacedNumber
+
+            if(state.lastPlacedNumber == myBoard.boardSize*myBoard.boardSize):
+                # isto quer dizer que ja coloquei o ultimo numero para cima, entao vamos voltar ao min e comecar a colocar para baixo
+                self.isIncreasing = -1
+                choosenNumber = min(myBoard.boardDict.keys())
+
+            while(choosenNumber + self.isIncreasing in state.board.boardDict.keys()):
+                choosenNumber = choosenNumber + self.isIncreasing
+         
+        adjacentPostions = myBoard.adjacent_vertical_numbers(myBoard.boardDict[choosenNumber][0], myBoard.boardDict[choosenNumber][1]) + myBoard.adjacent_horizontal_numbers(myBoard.boardDict[choosenNumber][0], myBoard.boardDict[choosenNumber][1])
         neighborOrder = [[-1,0], [1, 0], [0, -1], [0, 1]]  # order that  I will be looking at the neighbors up, down, left, right
         
         for x in range(len(neighborOrder)):
@@ -233,12 +247,15 @@ class Numbrix(Problem):
                 continue
         
             # vou querer meter o choosenNumber + 1 para os vizinhos
-            myPos = [element1 + element2 for (element1, element2) in zip(state.board.boardDict[choosenNumber], neighborOrder[x])]
-            stateList.append( ( myPos[0], myPos[1], choosenNumber + ( 1*isIncreasing ) ) )
+            myPos = [element1 + element2 for (element1, element2) in zip(myBoard.boardDict[choosenNumber], neighborOrder[x])]
+            stateList.append( ( myPos[0], myPos[1], choosenNumber + self.isIncreasing ) )
 
             
 
         actionsCounter += len(stateList)
+        # print(f"Choosen number {choosenNumber}")
+        # print("This is the aciton list  ", stateList)
+        # print( )
         return stateList
 
 
@@ -290,7 +307,7 @@ class Numbrix(Problem):
         
         # vou dict[n] e vejo se a posicao e vizinha do dict[n+1]
         # ver 1 com 2, 2 com 3, 3 com 4
-        for number in range(1, state.board.boardSize*state.board.boardSize-1):
+        for number in range(1, state.board.boardSize*state.board.boardSize):
             if not self.isNeighbour(state.board.boardDict[number], state.board.boardDict[number+1]):
                 # print("This was false")
                 return False
@@ -303,7 +320,7 @@ class Numbrix(Problem):
         """
         Receives two positions consisting of [x,y] and returns true if p1 and p2 are neighbours
         """
-         
+        # esta funcao esta a deixar passar valores na diagonal
         return abs(p1[0]-p2[0]) <= 1 and abs(p1[1]-p2[1]) <= 1 
 
 
@@ -334,6 +351,7 @@ if __name__ == "__main__":
 
     # Retirar a solução a partir do nó resultante,
     objective = depth_first_tree_search(myProblem)
+
     # objective = breadth_first_tree_search(myProblem)
 
     # Imprimir para o standard output no formato indicado.
@@ -342,4 +360,4 @@ if __name__ == "__main__":
     print("It took: ", end - start)
     
     print(f"Did this amount of acitons {actionsCounter}")
-    
+

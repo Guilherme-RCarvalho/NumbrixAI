@@ -1,0 +1,18 @@
+right now estou a tentar implementar as coisas como a marta
+comecar com o menor numero, preencher para cima e depois ir para o min e comecar a preencher para baixo
+
+no entanto entanto isto nao funciona, com o teste 2 ele chega ao fim e tem resposta
+enquanto estava a examinar ja encontrei um erro
+    mas nao era este o erro a razao para nao funcionar
+    a nossa funcao goal test, mais especificamente a funcao que ve os vizinhos considera as diagonais
+    e isso nao pode ser
+
+preciso de investigar mais para encontrar o real problema
+provavelmente esta nos estados que eu gero
+    testar com uma mapa mais pequeno e seguir os estados que ele gera a mao e ver se esta a fazer tudo bem
+    a razao para estar ai e porque foi a unica coisa que eu mudei da implementacao anterior para esta
+
+tenho alguma coisa de muito errado porque parece que os testes estao todos a falhar
+se calhar pode ter haver com a meneira como eu estou a meter o o decrement global
+    se calhar tenho de fazer isso para todos os estados filhos de um que tenha mudado
+    probs consigo fazer isso na funcao result
