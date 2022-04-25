@@ -202,14 +202,13 @@ class Numbrix(Problem):
 
         will return a sure action if available
         """
-        print(" doing single actions")
+        # print(" doing single actions")
         myBoard = state.board
         # iterate over all the placed values, in order
         for choosenNumber in sorted(myBoard.boardDict.keys()):
             neighborOrder = [[-1,0], [1, 0], [0, -1], [0, 1]]  # order that  I will be looking at the neighbors up, down, left, right
             adjacentPostions = myBoard.adjacent_vertical_numbers(myBoard.boardDict[choosenNumber][0], myBoard.boardDict[choosenNumber][1]) + myBoard.adjacent_horizontal_numbers(myBoard.boardDict[choosenNumber][0], myBoard.boardDict[choosenNumber][1])
 
-            freePos = [number for number in adjacentPostions if number == 0]
 
             if choosenNumber > 2 and choosenNumber < myBoard.boardSize*myBoard.boardSize and choosenNumber-1 not in myBoard.boardDict and choosenNumber-2 in myBoard.boardDict:
                 
@@ -217,18 +216,52 @@ class Numbrix(Problem):
                 posList = [tuple(myBoard.boardDict[choosenNumber-2]), tuple(myBoard.boardDict[choosenNumber])]
 
                 possibleList = self.getNeighbour(posList, state)
-                print(" This is the possible list ", possibleList, choosenNumber)
+                # print(" This is the possible list ", possibleList, choosenNumber)
                 seen = set()
                 dupes = [pos for pos in possibleList if pos in seen or seen.add(pos)]    
                 if len(dupes) == 0:
                     return []
-                print("     This is the dupes ", dupes)
+                # print("     This is the dupes ", dupes)
                 myList = []
                 for value in dupes:
                     myList.append((value[0], value[1], choosenNumber-1))
-                print("     returning this list", myList)
+                # print("     returning this list", myList)
                 return myList
+            
+            
+            freePos = []
+            for index in range(len(adjacentPostions)):
+                if adjacentPostions[index] != 0:
+                    continue
+            
+                freePos.append([myBoard.boardDict[choosenNumber][0]+neighborOrder[index][0], myBoard.boardDict[choosenNumber][1]+neighborOrder[index][1]])
 
+            # check for cells with just one available neighbor
+            if len(freePos) == 1:
+                # print(choosenNumber, " Only has one free neighbor")
+                # print(choosenNumber+1 in myBoard.boardDict, choosenNumber-1 in myBoard.boardDict)
+
+                if (choosenNumber+1 in myBoard.boardDict or choosenNumber == myBoard.boardSize*myBoard.boardSize) and (choosenNumber-1 in myBoard.boardDict or choosenNumber == 1):
+                    # means that it is okay to have only one neighbor
+                    continue
+                
+                if choosenNumber != 1 and choosenNumber != myBoard.boardSize**2 and choosenNumber+1 not in myBoard.boardDict and choosenNumber-1 not in myBoard.boardDict:
+                    # means that I am in a state that is not valid
+                    # a number has just one free pos and needs to put two numbers there
+                    print("I am here")
+                    return []
+                
+                if choosenNumber+1 in myBoard.boardDict and choosenNumber != 1:
+                    # means that in the free pos i want to put choosenNumber-1 
+                    return [(freePos[0][0], freePos[0][1], choosenNumber-1)]
+                if choosenNumber-1 in myBoard.boardDict and choosenNumber != myBoard.boardSize*myBoard.boardSize:
+                    # means that in the free pos i want to put choosenNumber+1
+                    return [(freePos[0][0], freePos[0][1], choosenNumber+1)]
+                    
+               
+                if len(freePos[0]) == 2:
+                    return None
+                return [(freePos[0])]
         return None
 
 
@@ -238,34 +271,23 @@ class Numbrix(Problem):
 
         global actionsCounter
 
-        # eu vou querer tentar mais duas coisas
-        # vou querer tentar fazer do max para baixo e depois max para cima
-        # e vou querer tentar fazer do min para cima e depois min para baixo
-
-        # vamos primeiro a cada numero colocado, ver os vizinhos e criar estados em que os vizinhos sao todos os os numeros adjacentes
-        # para isto se calhar vou querer ter um dicionario de numeros ja colocados e as posicoes deles mas por enquanto nao vou fazer isso
-        
-        # get the dict of placed numbers THIS CAN BE OPTIMIZED (prob create a list)
         
         stateList = []
         
         # mudar isto
         myBoard = state.board
-        
-        # vamos preencher isto tipo uma cobra, vou pegar no maximo preencher os vizinhos e fazer isso ate chegar ao fim
-        # depois vou pegar no meu max inicial e vou comecar a preencher para baixo e verificar se os numeros que estou a meter cabem
-        # vou ter uns problemas com isto depois quando voltar para o min, na verdade eu quero voltar para o max inicial mas depois penso nisto
+
         
         print("THis is the board")
         print(myBoard)
         
-        # if state.lastPlacedNumber != 6000:
-        #     singleActions = self.checkSingles(state)
-        #     if singleActions != None:
-        #         print("this is the single action ", singleActions)
-        #         print()
-        #         state.hasSingleAction = 1 # toggle the flag to know that this action was based on single action
-        #         return singleActions
+        singleActions = self.checkSingles(state)
+        if singleActions != None:
+            print("this is the single action ", singleActions)
+            print()
+            actionsCounter += len(singleActions)
+            state.hasSingleAction = 1 # toggle the flag to know that this action was based on single action
+            return singleActions
 
 
         if state.lastPlacedNumber == -1:
@@ -287,13 +309,6 @@ class Numbrix(Problem):
             state.isIncreasing = -1
             choosenNumber = min(myBoard.boardDict.keys())
 
-         
-        # vert = myBoard.adjacent_vertical_numbers(myBoard.boardDict[choosenNumber][0], myBoard.boardDict[choosenNumber][1])
-        # hor = myBoard.adjacent_horizontal_numbers(myBoard.boardDict[choosenNumber][0], myBoard.boardDict[choosenNumber][1])
-        # adjacentPostions = [hor[0], vert[0], hor[1], vert[1]]
-        # neighborOrder = [[0, -1], [-1,0], [0, 1], [1, 0]]  # order that  I will be looking at the neighbors up, down, left, right
-
-
         adjacentPostions = myBoard.adjacent_vertical_numbers(myBoard.boardDict[choosenNumber][0], myBoard.boardDict[choosenNumber][1]) + myBoard.adjacent_horizontal_numbers(myBoard.boardDict[choosenNumber][0], myBoard.boardDict[choosenNumber][1])
         neighborOrder = [[-1,0], [1, 0], [0, -1], [0, 1]]  # order that  I will be looking at the neighbors up, down, left, right
 
@@ -314,8 +329,8 @@ class Numbrix(Problem):
         
         futureSet = self.getn1(choosenNumber + state.isIncreasing*2, state)
         
-        # print("Future set ", futureSet)
-        # print("Possible set ", possibleSet)
+        print("Future set ", futureSet)
+        print("Possible set ", possibleSet)
 
         if len(futureSet) > 0:
             possibleSet = possibleSet.intersection(futureSet)
@@ -323,13 +338,13 @@ class Numbrix(Problem):
         stateList = [(myPos[0], myPos[1], choosenNumber+state.isIncreasing) for myPos in possibleSet]
 
         actionsCounter += len(stateList)
-
+        print(f"This is the action count {actionsCounter}")
         print(f"This is the len of future space {len(futureSet)}")
         print(f"THis is the parent ID {state.parentId} and this is my id {state.id}")
         print(f"Choosen number {choosenNumber} placed number {choosenNumber+state.isIncreasing} isIncreasing {state.isIncreasing}")
         print("This is the aciton list  ", stateList)
         print( )
-
+        # print("This is the state list", stateList, " here", state.id)
         return stateList
 
     def getn1(self, number, state, initial=-10):
@@ -351,7 +366,7 @@ class Numbrix(Problem):
             # limit my recursion
             # print("     here should be the limit")
             if number in state.board.boardDict:
-                print("     found this number", number)
+                # print("     found this number", number)
                 mySet = set()
                 mySet.add(tuple(state.board.boardDict[number]))
                 # print("         but found it dict")
@@ -368,7 +383,7 @@ class Numbrix(Problem):
             
             mySet = set()
             mySet.add(tuple(state.board.boardDict[number]))            
-            print("     found this number", number)
+            # print("     found this number", number)
             
             return self.getNeighbour(mySet, state)
 
@@ -419,6 +434,7 @@ class Numbrix(Problem):
         self.actions(state). """
         global stateSeen
 
+        # print("     DOing this action ", action, state.id)
         stateSeen += 1
         # print("This is result with this action type ", action, " and this is the new board:")
         # I will want to create a new state, not edit the old one
@@ -502,7 +518,7 @@ if __name__ == "__main__":
     # Ler o ficheiro de input de sys.argv[1],
     myBoard = Board.parse_instance(sys.argv[1])
 
-    start = time.time()
+    # start = time.time()
     
     # Usar uma técnica de procura para resolver a instância,
     myProblem = Numbrix(myBoard)
@@ -514,8 +530,8 @@ if __name__ == "__main__":
 
     # Imprimir para o standard output no formato indicado.
     print(objective.state.board)
-    end = time.time()
-    print("It took: ", end - start)
+    # end = time.time()
+    # print("It took: ", end - start)
     
     print(f"Did this amount of acitons {actionsCounter}")
     print(f"Seen this amount of states {stateSeen}")
