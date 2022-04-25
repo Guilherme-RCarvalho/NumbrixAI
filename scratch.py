@@ -1,36 +1,24 @@
-import time
 
-import debugpy
+import os
 
-# 5678 is the default attach port in the VS Code debug configurations. Unless a host and port are specified, host defaults to 127.0.0.1
-debugpy.listen(5678)
-print("Waiting for debugger attach")
-debugpy.wait_for_client()
+boardSize = 10
+myFile = open("myTest", "w")
+myFile.write(str(boardSize) + "\n")
 
-iterations = 1_000_000
+lineList = []
+for line in range(boardSize):
+    myLine = ""
+    for col in range(boardSize):
+        myLine = myLine + f"{0}\t"
+    myLine = myLine[:-1] + "\n"
 
+    lineList.append(myLine)
 
-loopList = []
-compreList = []
-
-for x in range(20):
-    start = time.time()
-    mylist = []
-    for i in range(iterations):
-        mylist.append(i)
-    end = time.time()
-    loopList.append(end-start)
-
-debugpy.breakpoint()
-print('break on this line')
+lineList[-1] = lineList[-1][:-1]
 
 
-for x in range(20):
+for line in lineList:
+    myFile.write(line)
 
-    start = time.time()
-    mylist = [i for i in range(iterations)]
-    end = time.time()
-    compreList.append(end-start)
 
-print(sum(loopList) / len(loopList))
-print(sum(compreList) / len(compreList))
+myFile.close()
