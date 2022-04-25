@@ -245,7 +245,7 @@ class Numbrix(Problem):
                     # means that it is okay to have only one neighbor
                     continue
                 
-                if choosenNumber != 1 and choosenNumber != myBoard.boardSize**2 and choosenNumber+1 not in myBoard.boardDict and choosenNumber-1 not in myBoard.boardDict:
+                if choosenNumber != 1 and choosenNumber != myBoard.boardSize*myBoard.boardSize and choosenNumber+1 not in myBoard.boardDict and choosenNumber-1 not in myBoard.boardDict:
                     # means that I am in a state that is not valid
                     # a number has just one free pos and needs to put two numbers there
                     print("I am here")
@@ -337,10 +337,12 @@ class Numbrix(Problem):
         if len(futureSet) > 0:
             possibleSet = possibleSet.intersection(futureSet)
 
-        stateList = [(myPos[0], myPos[1], choosenNumber+state.isIncreasing) for myPos in possibleSet]
+        myList = sorted(list(possibleSet) , key=lambda k: [k[1], k[0]])
+
+        stateList = [(myPos[0], myPos[1], choosenNumber+state.isIncreasing) for myPos in myList]
 
         actionsCounter += len(stateList)
-        print(f"This is the action count {actionsCounter}")
+        print(f"This is sorted {myList}")
         print(f"This is the len of future space {len(futureSet)}")
         print(f"THis is the parent ID {state.parentId} and this is my id {state.id}")
         print(f"Choosen number {choosenNumber} placed number {choosenNumber+state.isIncreasing} isIncreasing {state.isIncreasing}")
