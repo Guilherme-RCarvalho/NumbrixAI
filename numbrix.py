@@ -8,9 +8,8 @@
 
 
 import sys
-from search import Problem, Node, astar_search, breadth_first_tree_search, depth_first_tree_search, greedy_search, recursive_best_first_search
+from search import Problem, Node, astar_search, breadth_first_tree_search, depth_first_tree_search, greedy_search, recursive_best_first_search, compare_searchers2
 import time
-
 
 actionsCounter = 0 # represents how many actions were generated
 stateSeen = 0
@@ -238,9 +237,9 @@ class Numbrix(Problem):
 
             # check for cells with just one available neighbor
             if len(freePos) == 1:
-                print(choosenNumber, " Only has one free neighbor")
-                if choosenNumber == 81:
-                    print("heree")
+                #print(choosenNumber, " Only has one free neighbor")
+                #if choosenNumber == 81:
+                    #print("heree")
                 if (choosenNumber+1 in myBoard.boardDict or choosenNumber == myBoard.boardSize*myBoard.boardSize) and (choosenNumber-1 in myBoard.boardDict or choosenNumber == 1):
                     # means that it is okay to have only one neighbor
                     continue
@@ -248,7 +247,7 @@ class Numbrix(Problem):
                 if choosenNumber != 1 and choosenNumber != myBoard.boardSize*myBoard.boardSize and choosenNumber+1 not in myBoard.boardDict and choosenNumber-1 not in myBoard.boardDict:
                     # means that I am in a state that is not valid
                     # a number has just one free pos and needs to put two numbers there
-                    print("I am here")
+                    #print("I am here")
                     return []
                 
                 if choosenNumber+1 in myBoard.boardDict and choosenNumber != 1:
@@ -278,13 +277,13 @@ class Numbrix(Problem):
         myBoard = state.board
 
         
-        print("THis is the board")
-        print(myBoard)
+        #print("THis is the board")
+        #print(myBoard)
         
         singleActions = self.checkSingles(state)
         if singleActions != None:
-            print("this is the single action ", singleActions)
-            print()
+            #print("this is the single action ", singleActions)
+            #print()
             actionsCounter += len(singleActions)
             state.hasSingleAction = 1 # toggle the flag to know that this action was based on single action
             return singleActions
@@ -331,23 +330,22 @@ class Numbrix(Problem):
         
         futureSet = self.getn1(choosenNumber + state.isIncreasing*2, state)
         
-        print("Future set ", futureSet)
-        print("Possible set ", possibleSet)
+        #print("Future set ", futureSet)
+        #print("Possible set ", possibleSet)
 
         if len(futureSet) > 0:
             possibleSet = possibleSet.intersection(futureSet)
 
-        myList = sorted(list(possibleSet) , key=lambda k: [k[1], k[0]])
 
-        stateList = [(myPos[0], myPos[1], choosenNumber+state.isIncreasing) for myPos in myList]
+        stateList = [(myPos[0], myPos[1], choosenNumber+state.isIncreasing) for myPos in possibleSet]
 
         actionsCounter += len(stateList)
-        print(f"This is sorted {myList}")
-        print(f"This is the len of future space {len(futureSet)}")
-        print(f"THis is the parent ID {state.parentId} and this is my id {state.id}")
-        print(f"Choosen number {choosenNumber} placed number {choosenNumber+state.isIncreasing} isIncreasing {state.isIncreasing}")
-        print("This is the aciton list  ", stateList)
-        print( )
+        #print(f"This is sorted {myList}")
+        #print(f"This is the len of future space {len(futureSet)}")
+        #print(f"THis is the parent ID {state.parentId} and this is my id {state.id}")
+        #print(f"Choosen number {choosenNumber} placed number {choosenNumber+state.isIncreasing} isIncreasing {state.isIncreasing}")
+        #print("This is the aciton list  ", stateList)
+        #print( )
         # print("This is the state list", stateList, " here", state.id)
         return stateList
 
@@ -436,10 +434,10 @@ class Numbrix(Problem):
         'state' passado como argumento. A ação a executar deve ser uma
         das presentes na lista obtida pela execução de 
         self.actions(state). """
-        global stateSeen
+        
 
         # print("     DOing this action ", action, state.id)
-        stateSeen += 1
+        
         # print("This is result with this action type ", action, " and this is the new board:")
         # I will want to create a new state, not edit the old one
 
@@ -475,9 +473,9 @@ class Numbrix(Problem):
         um estado objetivo. Deve verificar se todas as posições do tabuleiro 
         estão preenchidas com uma sequência de números adjacentes. """
 
-
+        global stateSeen
         # ver se tenho todos os numeros colocados com o filledSquares (poupar loop)
-
+        stateSeen += 1
         # Check if all numbers have been filled
         if state.board.filledSquares != state.board.boardSize*state.board.boardSize:
             # print("This was false")
@@ -503,11 +501,36 @@ class Numbrix(Problem):
 
 
     def h(self, node: Node):
-        """ Função heuristica utilizada para a procura A*. """
-        # TODO
-        pass
-    
-    # TODO: outros metodos da classe
+        """ Função heuristica utilizada para a procura A*. 
+            Minumum path between number and next number
+        """
+        if node.action == None:
+            return 1E5
+        row = node.action[0]
+        col = node.action[1]
+        val = node.action[2]
+        for value in node.state.board.boardDict:
+            if value>val:
+                row2,col2 = node.state.board.boardDict[value]
+                return abs(row-row2) + abs(col-col2)
+        return 0
+    def compare_graph_searchers2(self):#mudarrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr input extra 6/7
+        
+        compare_searchers2(problems=[Numbrix(Board.parse_instance("tests_final_public/input1.txt")),
+                                        Numbrix(Board.parse_instance("tests_final_public/input2.txt")),
+                                        Numbrix(Board.parse_instance("tests_final_public/input3.txt")),
+                                        Numbrix(Board.parse_instance("tests_final_public/input4.txt")),
+                                        Numbrix(Board.parse_instance("tests_final_public/input5.txt"))],
+                        header=['Searcher', 'input1', 'input2',
+                                'input3', 'input4', 'input5'])
+        
+        compare_searchers2(problems=[Numbrix(Board.parse_instance("tests_final_public/input6.txt")),
+                                        Numbrix(Board.parse_instance("tests_final_public/input7.txt")),
+                                        Numbrix(Board.parse_instance("tests_final_public/input8.txt")),
+                                        Numbrix(Board.parse_instance("tests_final_public/input9.txt")),
+                                        Numbrix(Board.parse_instance("tests_final_public/input10.txt"))],
+                        header=['Searcher', 'input6',
+                                 'input7', 'input8', 'input9', 'input10'])
 
 
 if __name__ == "__main__":
@@ -522,7 +545,7 @@ if __name__ == "__main__":
     # Ler o ficheiro de input de sys.argv[1],
     myBoard = Board.parse_instance(sys.argv[1])
 
-    # start = time.time()
+    start = time.time()
     
     # Usar uma técnica de procura para resolver a instância,
     myProblem = Numbrix(myBoard)
@@ -530,13 +553,13 @@ if __name__ == "__main__":
     # Retirar a solução a partir do nó resultante,
     objective = depth_first_tree_search(myProblem)
 
-    # objective = breadth_first_tree_search(myProblem)
-
     # Imprimir para o standard output no formato indicado.
-    print(objective.state.board)
-    # end = time.time()
-    # print("It took: ", end - start)
+    myProblem.compare_graph_searchers2()
+    #print(objective.state.board)
     
-    print(f"Did this amount of acitons {actionsCounter}")
-    print(f"Seen this amount of states {stateSeen}")
+    end = time.time()
+    print("It took: ", end - start)
+    
+    #print(f"Did this amount of acitons {actionsCounter}")
+    #print(f"Seen this amount of states {stateSeen}")
 

@@ -1,0 +1,164 @@
+THis is the board
+1	0	0
+0	5	4
+0	0	9
+4  Only has one free neighbor
+this is the single action  [(0, 2, 3)]
+
+THis is the board
+1	0	3
+0	5	4
+0	0	9
+this is the single action  [(0, 1, 2)]
+
+THis is the board
+1	2	3
+0	5	4
+0	0	9
+1  Only has one free neighbor
+9  Only has one free neighbor
+Future set  set()
+Possible set  {(1, 0), (2, 1)}
+This is the action count 4
+This is the len of future space 0
+THis is the parent ID 1 and this is my id 2
+Choosen number 5 placed number 6 isIncreasing 1
+This is the aciton list   [(1, 0, 6), (2, 1, 6)]
+
+This is the state list [(1, 0, 6), (2, 1, 6)]  here 2
+THis is the board
+1	2	3
+0	5	4
+0	6	9
+1  Only has one free neighbor
+5  Only has one free neighbor
+6  Only has one free neighbor
+this is the single action  [(2, 0, 7)]
+
+THis is the board
+1	2	3
+0	5	4
+7	6	9
+1  Only has one free neighbor
+5  Only has one free neighbor
+7  Only has one free neighbor
+this is the single action  [(1, 0, 8)]
+
+THis is the board
+1	2	3
+8	5	4
+7	6	9
+Future set  set()
+Possible set  set()
+This is the action count 6
+This is the len of future space 0
+THis is the parent ID 5 and this is my id 6
+Choosen number 1 placed number 0 isIncreasing -1
+This is the aciton list   []
+
+This is the state list []  here 6
+THis is the board
+1	2	3
+6	5	4
+0	0	9
+5  Only has one free neighbor
+6  Only has one free neighbor
+this is the single action  [(2, 0, 7)]
+
+THis is the board
+1	2	3
+6	5	4
+7	0	9
+5  Only has one free neighbor
+7  Only has one free neighbor
+this is the single action  [(2, 1, 8)]
+
+1	2	3
+6	5	4
+7	8	9
+None
+THis is the board
+1	0	0
+0	5	4
+0	0	9
+4  Only has one free neighbor
+this is the single action  [(0, 2, 3)]
+
+(0, 2, 3)
+New neighbors {(0, 1)}
+cnt: 1
+THis is the board
+1	0	3
+0	5	4
+0	0	9
+this is the single action  [(0, 1, 2)]
+
+(0, 1, 2)
+New neighbors set()
+cnt: 0
+THis is the board
+1	2	3
+0	5	4
+0	0	9
+1  Only has one free neighbor
+9  Only has one free neighbor
+Future set  set()
+Possible set  {(1, 0), (2, 1)}
+This is the action count 12
+This is the len of future space 0
+THis is the parent ID 10 and this is my id 11
+Choosen number 5 placed number 6 isIncreasing 1
+This is the aciton list   [(1, 0, 6), (2, 1, 6)]
+
+This is the state list [(1, 0, 6), (2, 1, 6)]  here 11
+(1, 0, 6)
+New neighbors {(2, 0)}
+cnt: 1
+(2, 1, 6)
+New neighbors {(2, 0)}
+cnt: 1
+THis is the board
+1	2	3
+6	5	4
+0	0	9
+5  Only has one free neighbor
+6  Only has one free neighbor
+this is the single action  [(2, 0, 7)]
+
+(2, 0, 7)
+New neighbors {(2, 1)}
+cnt: 1
+THis is the board
+1	2	3
+0	5	4
+0	6	9
+1  Only has one free neighbor
+5  Only has one free neighbor
+6  Only has one free neighbor
+this is the single action  [(2, 0, 7)]
+
+(2, 0, 7)
+New neighbors {(1, 0)}
+cnt: 1
+THis is the board
+1	2	3
+6	5	4
+7	0	9
+5  Only has one free neighbor
+7  Only has one free neighbor
+this is the single action  [(2, 1, 8)]
+
+(2, 1, 8)
+New neighbors set()
+cnt: 0
+1	2	3
+6	5	4
+7	8	9
+DFS:
+It took:  0.00034308433532714844
+Did this amount of acitons 8
+Seen this amount of states 8
+Greedy:
+It took:  0.0005950927734375
+Did this amount of acitons 15
+Seen this amount of states 15

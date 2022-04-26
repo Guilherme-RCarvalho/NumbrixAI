@@ -8,6 +8,7 @@ functions.
 
 import sys
 from collections import deque
+import time 
 
 from utils import *
 
@@ -241,6 +242,7 @@ def breadth_first_graph_search(problem):
     single line as below:
     return graph_search(problem, FIFOQueue())
     """
+    problem.start = time.time()
     node = Node(problem.initial)
     if problem.goal_test(node.state):
         return node
@@ -1524,7 +1526,8 @@ class InstrumentedProblem(Problem):
         self.problem = problem
         self.succs = self.goal_tests = self.states = 0
         self.found = None
-
+        self.start = 0
+        self.end = 0
     def actions(self, state):
         self.succs += 1
         return self.problem.actions(state)
@@ -1550,8 +1553,8 @@ class InstrumentedProblem(Problem):
         return getattr(self.problem, attr)
 
     def __repr__(self):
-        return '<{:4d}/{:4d}/{:4d}/{}>'.format(self.succs, self.goal_tests,
-                                               self.states, str(self.found)[:4])
+        return '<{:4d}/{:4d}/{}/{}>'.format(self.succs, self.goal_tests,
+                                               self.end-self.start, str(self.found)[:4])
 
 
 def compare_searchers(problems, header,
@@ -1577,3 +1580,17 @@ def compare_graph_searchers():
                                 GraphProblem('Q', 'WA', australia_map)],
                       header=['Searcher', 'romania_map(Arad, Bucharest)',
                               'romania_map(Oradea, Neamt)', 'australia_map'])
+def compare_searchers2(problems, header,
+                      searchers=[breadth_first_tree_search,
+                                 depth_first_tree_search,
+                                 greedy_search,
+                                 astar_search]):
+    def do(searcher, problem):
+        p = InstrumentedProblem(problem)
+        problem.start = time.time()
+        searcher(p)
+        problem.end = time.time()
+        return p , (problem.end - problem.start)*1000
+
+    table = [[name(s)] + [do(s, p) for p in problems] for s in searchers]
+    print_table(table, header)
